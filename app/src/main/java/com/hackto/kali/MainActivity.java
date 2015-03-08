@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +41,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private final String SETTING_PHONE_NUMBER_KEY = "phoneNumber";
     private final String SETTING_HELP_OPTION_KEY = "helpOption";
     private final String SETTING_PHONE_NUMBER_DEFAULT = "(123) 456-7890";
-    private final String SETTING_HELP_OPTION_DEFAULT = "text";
+    private final String SETTING_HELP_OPTION_DEFAULT = "call";
 
     public EditText phoneField;
     public RadioButton radioText;
@@ -51,8 +62,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         savedSettings = getPreferences(MODE_PRIVATE);
         saveButton = (Button) findViewById(R.id.button1);
         phoneField = (EditText) findViewById(R.id.editText1);
-        radioText = (RadioButton) findViewById(R.id.radioText);
-        radioCall = (RadioButton) findViewById(R.id.radioCall);
+        //radioText = (RadioButton) findViewById(R.id.radioText);
+        //radioCall = (RadioButton) findViewById(R.id.radioCall);
 
         saveButton.setOnClickListener(this);
 
@@ -89,11 +100,27 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         SharedPreferences.Editor editor = savedSettings.edit();
 
         editor.putString(SETTING_PHONE_NUMBER_KEY, phoneField.getText().toString());
-
-        String helpOption = radioText.isChecked() ? "text" : "call";
-        editor.putString(SETTING_HELP_OPTION_KEY, helpOption);
-
+        //String helpOption = radioText.isChecked() ? "text" : "call";
+        //editor.putString(SETTING_HELP_OPTION_KEY, helpOption);
         editor.apply();
+
+        //Save data to db
+        String ip="";
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://" + ip + "/api/account/update-profile");
+
+        try {
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair("phoneNumber", phoneField.getText().toString()));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+
+        } catch (Exception e) {
+            Log.v("AARDVARK", e.getMessage());
+        }
     }
 
     public void loadSettings() {
@@ -118,11 +145,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     public void setTextOption() {
-        radioText.setChecked(true);
+        //radioText.setChecked(true);
     }
 
     public void setCallOption() {
-        radioCall.setChecked(true);
+        //radioCall.setChecked(true);
     }
 
     public void loadPhoneNumber(String phoneNumber) {
