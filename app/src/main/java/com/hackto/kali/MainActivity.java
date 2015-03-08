@@ -40,7 +40,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public SharedPreferences savedSettings;
     public BluetoothAdapter blueToothAdapter;
     public List<BluetoothDevice> pairedDevices;
-    public ConnectThread connectThread;
     public Handler handler;
     BroadcastReceiver receiver;
 
@@ -58,17 +57,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         saveButton.setOnClickListener(this);
 
         loadSettings();
-
-//        receiver = buildBroadCastReceiver();
-//        registerReceiver();
-
-        handler = buildHandler();
-
-        blueToothAdapter = BluetoothAdapter.getDefaultAdapter();
-        initBluetooth();
-
-        connectThread = new ConnectThread(getFirstDevice(), getFirstDeviceUUID(), blueToothAdapter, handler);
-        startConnectThread();
     }
 
 
@@ -143,79 +131,5 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public String getPhoneNumber() {
         return savedSettings.getString(SETTING_PHONE_NUMBER_KEY, SETTING_PHONE_NUMBER_DEFAULT);
-    }
-
-    public void initBluetooth() {
-        if (!hasBluetoothCapabilities()) {
-            // TODO: Set status
-        } else if (!isBluetoothEnabled()) {
-            promptToEnableBluetooth();
-        } else {
-            updatePairedDevices();
-        }
-    }
-
-    public boolean hasBluetoothCapabilities() {
-        return blueToothAdapter != null;
-    }
-
-    public boolean isBluetoothEnabled() {
-        return blueToothAdapter.isEnabled();
-    }
-
-    public void promptToEnableBluetooth() {
-        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent, 1);
-    }
-
-    public void updatePairedDevices() {
-        pairedDevices = new ArrayList<BluetoothDevice>(blueToothAdapter.getBondedDevices());
-    }
-
-    public BluetoothDevice getFirstDevice() {
-        return pairedDevices.get(0);
-    }
-
-    public UUID getFirstDeviceUUID() {
-        return getFirstDevice().getUuids()[0].getUuid();
-    }
-
-    public void startConnectThread() {
-        connectThread.start();
-    }
-
-    public Handler buildHandler() {
-        return new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                byte[] writeBuf = (byte[]) msg.obj;
-                int begin = (int) msg.arg1;
-                int end = (int) msg.arg2;
-
-                switch (msg.what) {
-                    case 1:
-                        String writeMessage = new String(writeBuf);
-                        writeMessage = writeMessage.substring(begin, end);
-                        break;
-                }
-            }
-        };
-    }
-
-    public BroadcastReceiver buildBroadCastReceiver() {
-        return new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    pairedDevices.add(device);
-                }
-            }
-        };
-    }
-
-    public void registerReceiver() {
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(receiver, filter);
     }
 }
