@@ -105,7 +105,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         editor.apply();
 
         //Save data to db
-        String ip="";
+        String ip="104.131.5.204:9000";
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost("http://" + ip + "/api/account/update-profile");
 
