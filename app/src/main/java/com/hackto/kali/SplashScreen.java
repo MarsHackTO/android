@@ -1,8 +1,5 @@
-package com.anroid.hacktoandroid;
+package com.hackto.kali;
 
-SplashScreen.java
-package info.androidhive.androidsplashscreentimer;
- 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
