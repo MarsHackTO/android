@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
@@ -28,6 +29,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -104,23 +107,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         //editor.putString(SETTING_HELP_OPTION_KEY, helpOption);
         editor.apply();
 
-        //Save data to db
-        String ip="104.131.5.204:9000";
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://" + ip + "/api/account/update-profile");
-
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("phoneNumber", phoneField.getText().toString()));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-
-        } catch (Exception e) {
-            Log.v("AARDVARK", e.getMessage());
-        }
+        new HitIt().execute();
     }
 
     public void loadSettings() {
@@ -158,5 +145,29 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public String getPhoneNumber() {
         return savedSettings.getString(SETTING_PHONE_NUMBER_KEY, SETTING_PHONE_NUMBER_DEFAULT);
+    }
+
+    private class HitIt extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            String ip = "104.131.5.204:9000";
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://" + ip + "/api/account/update-profile");
+
+            try {
+                HttpParams params = new BasicHttpParams();
+                params.setParameter("phoneNumber", "+1" + phoneField.getText().toString());
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                nameValuePairs.add(new BasicNameValuePair("phoneNumber", "+1" + phoneField.getText().toString()));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                httppost.setParams(params);
+
+                HttpResponse response = httpclient.execute(httppost);
+            } catch (Exception e) {
+                Log.v("AARDVARK", e.getMessage());
+            }
+
+            return "Hey";
+        }
     }
 }

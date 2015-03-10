@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,8 +16,7 @@
         <activity
             android:name=".SplashScreen"
             android:label="Kali"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Black.NoTitleBar" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -24,8 +25,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="Kali"
-            android:theme="@android:style/Theme.Black.NoTitleBar">
+            android:label="Kali">
         </activity>
     </application>
 
